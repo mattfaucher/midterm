@@ -391,15 +391,13 @@ public class RedBlackBST<Key extends Comparable<Key>, Value> {
       flipChildren(root);
 
     root = delete(root, key);
-    if (!isEmpty())
-      flipChildren(root);
+    if (!isEmpty()) flipChildren(root);
     // assert check();
   }
 
   // delete the key-value pair with the given key rooted at h
   private Node delete(Node h, Key key) {
     // assert get(h, key) != null;
-
     if (key.compareTo(h.key) < 0) {
       if (!isRed(h.left) && !isRed(h.left.left))
         h = moveRedLeft(h);
