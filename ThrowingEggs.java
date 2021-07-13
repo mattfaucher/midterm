@@ -30,13 +30,18 @@ public class ThrowingEggs {
    */
 
   // Find the floor in Log time using Binary Search
-  public int findFloorBinarySearchN(int[] floors) {
+  public int findFloorBinarySearchLogN(int[] floors) {
     // this uses regular binary search over the whole size of the floors
     // start lo at 0 and hi at max index
     int lo = 0;
     int hi = floors.length - 1;
     // call binary search on whole search space
     return binarySearch(floors, lo, hi);
+  }
+  
+  public int findFloorBinarySearchLogFNew(int[] floors) {
+    // TODO
+    return 0;
   }
 
   // Find the floor in LogF time using power of 2 increments to decrease
@@ -73,7 +78,6 @@ public class ThrowingEggs {
   private int binarySearch(int[] arr, int L, int R) {
     // broken is 1, 1 signifies we have a broken egg
     int broken = 1;
-
     // if lo > hi we want to stop
     if (R >= L) {
       // calculate new mid
@@ -104,7 +108,7 @@ public class ThrowingEggs {
     ThrowingEggs eggs = new ThrowingEggs();
     System.out.println("===========Test 1 ==========");
     int[] floors = {0,0,0,0,0,0,0,0,0,1,1,1,1,1};
-    if (eggs.findFloorBinarySearchN(floors) == eggs.findFloorBinarySearchLogF(floors)) {
+    if (eggs.findFloorBinarySearchLogN(floors) == eggs.findFloorBinarySearchLogF(floors)) {
       System.out.println("Test 1 passed");
     }
   }
