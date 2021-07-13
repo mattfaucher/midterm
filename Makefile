@@ -1,0 +1,10 @@
+make eggs:
+	javac ThrowingEggs.java
+make qsort:
+	javac NonRecursiveQSort.java
+make pq:
+	javac MinMaxPriorityQueue.java
+make bst:
+	javac RedBlackBST.java
+make clean:
+	rm *.class
