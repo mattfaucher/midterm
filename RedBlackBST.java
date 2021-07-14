@@ -400,29 +400,38 @@ public class RedBlackBST<Key extends Comparable<Key>, Value> {
   // delete the key-value pair with the given key rooted at h
   private Node delete(Node h, Key key) {
     // assert get(h, key) != null;
+    // Null check here for node passed in
     if (h == null) return null;
+    // if key we get passed in is less than key of h
     if (key.compareTo(h.key) < 0) {
+      // Case when we have a black node
       if (!isRed(h)) {
+        // if h's left child is a black node as well
         if (!isRed(h.left)) {
-          if (!isRed(h.left) && h.left != null && !isRed(h.left.left)) {
-            h = moveRedLeft(h);
-          }
+          // check child of left child for black
+          // if this is the case we must move a red to the left
+          if (!isRed(h.left.left)) h = moveRedLeft(h);
         } else {
-          if (!isRed(h.left) && h.left != null && !isRed(h.left.right)) {
-            h = moveRedLeft(h);
-          }
+          // if h's left child is RED
+          // check h's left child's right child for BLACK
+          // if it's black we need to move red to the left for balance
+          if (!isRed(h.left.right)) h = moveRedLeft(h);
         }
       } else {
+        // if the key passed in is GREATER than h's key
+        // if h's right is black
         if (!isRed(h.right)) {
-          if (!isRed(h.right) && h.right != null && !isRed(h.right.left)) {
-            h = moveRedLeft(h);
-          }
+          // check h's right childs left child for black
+          // if it's black we must rotate it left for balance
+          if (!isRed(h.right.left)) h = moveRedLeft(h);
         } else {
-          if (!isRed(h.right) && h.right != null && !isRed(h.right.right)) {
-            h = moveRedLeft(h);
-          }
+          // case when h's right child is red
+          // if h's right child's right child is black, move it left
+          if (!isRed(h.right.right)) h = moveRedLeft(h);
         }
       }
+      // base cases for deletion
+      // TODO
       if (!isRed(h)) {
         h.left = delete(h.left, key);
       } else {
