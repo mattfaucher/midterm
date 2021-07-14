@@ -39,77 +39,93 @@ public class ThrowingEggs {
     return binarySearch(floors, lo, hi);
   }
   
-  public int findFloorBinarySearchLogFNew(int[] floors) {
-    // TODO
-    return 0;
-  }
-
-  // Find the floor in LogF time using power of 2 increments to decrease
-  // search space, then using Binary search within that space
-  public int findFloorBinarySearchLogF(int[] floors) {
-    // broken is 1
-    int broken = 1;
-    int search = 0;
-
-    // Iterate over powers of 2 to decrease search space
-    while (search < floors.length) {
-      // if we found the broken floor, break out
-      if (broken == floors[search]) break;
-      // use this to be able to increment by powers of 2 (0 can't multiply alone)
-      if (search == 0) search = 2;
-      else search *= 2;
-    }
-
-    // set prevFloor to previous power of 2 so we have a reduced range
-    // searching in between 2^k and 2^k+1
-    int prevPowerOf2 = search / 2;
-    // Find and use the minimum range (array size vs search value)
-    search = Math.min(floors.length - 1, search);
-    // use the value of search to binary search the smaller space
-    int floor = binarySearch(floors, prevPowerOf2 + 1, search - 1);
-    // if we didn't get a -1, return the floor
-    if (floor != -1) return floor;
-    // otherwise return the search value
-    else return search;
-  }
-
-  // Essentially default binary search implementation
-  // except we only need to check if we've come across a 1 yet
-  private int binarySearch(int[] arr, int L, int R) {
-    // broken is 1, 1 signifies we have a broken egg
-    int broken = 1;
-    // if lo > hi we want to stop
-    if (R >= L) {
-      // calculate new mid
-      int mid = L + (R - L) / 2;
-      // check if we are at an index where no broken eggs yet
-      if (arr[mid] < broken) {
-        // if we haven't come across a 1 yet, search right half
-        return binarySearch(arr, mid + 1, R);
-      } else {
-        // return binary search call on right half of array
-        int brokenFloor = binarySearch(arr, L, mid - 1);
-        // check for not found
-        if (brokenFloor == -1) {
-          // return prev mid (index) if it's -1
-          return mid;
-        } else {
-          // return found lowest egg broken floor
-          return brokenFloor;
-        }
+  // Binary search implementation
+  private int binarySearch(int[] arr, int l, int r) {
+    // if left is still below right in array
+    if (l <= r) {
+      // calculate mid value
+      int mid = l + (r - l) / 2;
+      // if we came across a broken egg
+      // binary search right side of array if we haven't come across a 1 yet
+      if (arr[mid] == 0) return binarySearch(arr, mid + 1, r);
+      else {
+        // we search the left side of the array if we've seen a 1
+        int lowerIdx = binarySearch(arr, l, mid - 1);
+        // if we got a -1 then we return mid
+        if (lowerIdx == -1) return mid;
+        // otherwise we return the lowerIdx with the floor
+        else return lowerIdx;
       }
     }
-    // default return -1
+    // return -1 for not found
     return -1;
+  }
+  
+  // Method to use powers of two to cut the search space down before we binary search
+  // leading us to binary search in roughly 2logF time rather than logN
+  public int findFloorBinarySearchLogF(int[] floors) {
+    int power2 = 0;
+
+    // iterate over powers of 2 until we find a 1 or go past array size
+    while (power2 < floors.length) {
+      //
+      if (floors[power2] == 1) break;
+      // on first iteration power2 needs to be incremented so multiplication
+      // will have an affect on the iteration
+      else if (power2 == 0) power2++; 
+      // double power2
+      power2 *= 2;
+    }
+    
+    // we need to store the previous power of 2 in a variable to use for our range
+    int prevPower = power2 / 2;
+    // now power2 will be > floors.length, so we take the smaller of the two values
+    int minLength = Math.min(power2, floors.length - 1);
+    
+    // delegate work to binary search
+    return binarySearch(floors, prevPower, minLength);
+  }
+  
+  // method for running unit tests more easily than typing them out manually
+  public void unitTest(ThrowingEggs eggs, int[] arr, int expected) {
+    StringBuilder sb = new StringBuilder();
+    sb.append("Expected: ")
+      .append(expected)
+      .append(" -> test: ");
+    String output = eggs.findFloorBinarySearchLogN(arr) == eggs.findFloorBinarySearchLogF(arr) ? "PASS" : "FAIL";
+    sb.append(output);
+    System.out.println(sb.toString());
   }
 
   /* MAIN METHOD FOR TESTING */
   public static void main(String[] args) {
     ThrowingEggs eggs = new ThrowingEggs();
-    System.out.println("===========Test 1 ==========");
-    int[] floors = {0,0,0,0,0,0,0,0,0,1,1,1,1,1};
-    if (eggs.findFloorBinarySearchLogN(floors) == eggs.findFloorBinarySearchLogF(floors)) {
-      System.out.println("Test 1 passed");
-    }
+
+    System.out.println("===========Test 1==========");
+    int[] test1 = {0,0,0,0,0,0,0,0,0,1,1,1,1,1};
+    eggs.unitTest(eggs, test1, 9);
+
+    System.out.println("===========Test 2==========");
+    int[] test2 = {0,0,0,0,0,0,0,0};
+    eggs.unitTest(eggs, test2, -1);
+
+    System.out.println("===========Test 3==========");
+    int[] test3 = {0};
+    eggs.unitTest(eggs, test3, -1);
+
+    System.out.println("===========Test 4==========");
+    int[] test4 =
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1};
+    eggs.unitTest(eggs, test4, 29);
+
+    System.out.println("===========Test 5==========");
+    int[] test5 = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,1,1,1,1,1};
+    eggs.unitTest(eggs, test5, 50);
+
+    System.out.println("===========Test 6==========");
+    int[] test6 = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+    eggs.unitTest(eggs, test6, -1);
   }
 }
