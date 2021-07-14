@@ -5,7 +5,6 @@
    value of F such that the number of broken eggs is ~lg N when using ~lg N
    throws, then find a way to reduce the cost to ~2lg F.
 */
-
 /* 
  * This problem requires that we use binary search to find the first occurrence
  * of an egg breaking. However in order to optimize our solution to be ~2logF
@@ -13,7 +12,6 @@
  * of a breaking egg, then use binary search on the smaller space rather than
  * binary searching over the entire array of size N.
  */
-
 /* ======= COMPLEXITIES ============ */
 // Time complexity of Binary search = O(log N)
 // Space complexity of Binary Search = N
@@ -65,10 +63,9 @@ public class ThrowingEggs {
   // leading us to binary search in roughly 2logF time rather than logN
   public int findFloorBinarySearchLogF(int[] floors) {
     int power2 = 0;
-
     // iterate over powers of 2 until we find a 1 or go past array size
     while (power2 < floors.length) {
-      //
+      // if we find a 1 break out of loop
       if (floors[power2] == 1) break;
       // on first iteration power2 needs to be incremented so multiplication
       // will have an affect on the iteration
@@ -76,7 +73,6 @@ public class ThrowingEggs {
       // double power2
       power2 *= 2;
     }
-    
     // we need to store the previous power of 2 in a variable to use for our range
     int prevPower = power2 / 2;
     // now power2 will be > floors.length, so we take the smaller of the two values
