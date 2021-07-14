@@ -14,6 +14,10 @@
 
 import java.util.Stack;
 
+// Since the methods are all static, the most generic I
+// could make the class was to pass in Comparable types
+// for all the methods so any object that extends
+// comparable can use these static methods
 public class NonRecursiveQSort {
 
   // Client method that calls qsort internally
