@@ -639,15 +639,45 @@ public class RedBlackBST<Key extends Comparable<Key>, Value> {
   }
 
   // restore red-black tree invariant
+  // this logic is IDENTICAL to the logic from PUT
   private Node balance(Node h) {
-    // assert (h != null);
+    if (h == null) return null;
 
-    if (isRed(h.right) && !isRed(h.left))
-      h = rotateLeft(h);
-    if (isRed(h.left) && isRed(h.left.left))
-      h = rotateRight(h);
-    if (isRed(h.left) && isRed(h.right))
+    if (!isRed(h)) {
+      if (isRed(h.right)) {
+        h = rotateLeft(h);
+      }
+    } else {
+      if (isRed(h.left)) {
+        h = rotateLeft(h);
+      }
+    }
+
+    if (!isRed(h)) {
+      if (!isRed(h.left)) {
+        if (isRed(h.left) && isRed(h.left.left)) {
+          h = rotateRight(h);
+        }
+      } else {
+        if (isRed(h.left) && isRed(h.left.right)) {
+          h = rotateRight(h);
+        }
+      }
+    } else {
+      if (!isRed(h.right)) {
+        if (isRed(h.right) && isRed(h.right.left)) {
+          h = rotateRight(h);
+        }
+      } else {
+        if (isRed(h.right) && iRed(h.right.right)) {
+          h = rotateRight(h);
+        }
+      }
+    }
+
+    if (isRed(h.left) && isRed(h.right)) {
       flipColors(h);
+    }
 
     h.size = size(h.left) + size(h.right) + 1;
     return h;
