@@ -22,8 +22,7 @@
 // Space complexity for all methods is O(N)
 // the size is dependent on the number of nodes
 
-
-// reference: https://github.com/reneargento/algorithms-sedgewick-wayne/blob/master/src/chapter1/section4/Exercise24_ThrowingEggs.java
+// reference: https://github.com/reneargento/algorithms-sedgewick-wayne/blob/master/src/chapter3/section3/Exercise29_OptimalStorage.java
 
 import java.util.LinkedList;
 import java.util.Queue;
