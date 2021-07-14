@@ -7,7 +7,7 @@
 // on the next iteration. Keep looping until our stack is empty.
 
 /* ======= Complexities ========== */
-// Time complexity of NRQSort = O(N log N)
+// Time complexity of NRQSort = O(Nlog N)
 // Space complexity of NRQSort = N
 // we do add a stack data structure to be used but the memory added isn't
 // a greater complexity than what already exists.

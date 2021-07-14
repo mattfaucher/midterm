@@ -134,7 +134,6 @@ public class MinMaxPriorityQueue {
     }
   }
 
-
   // Swim method that takes in a boolean to determine
   // if we want to do max / min operations
   private void swim(boolean which, int k) {

@@ -401,7 +401,6 @@ public class RedBlackBST<Key extends Comparable<Key>, Value> {
   private Node delete(Node h, Key key) {
     // assert get(h, key) != null;
     if (h == null) return null;
-
     if (key.compareTo(h.key) < 0) {
       if (!isRed(h)) {
         if (!isRed(h.left)) {
@@ -424,7 +423,6 @@ public class RedBlackBST<Key extends Comparable<Key>, Value> {
           }
         }
       }
-
       if (!isRed(h)) {
         h.left = delete(h.left, key);
       } else {
@@ -440,11 +438,9 @@ public class RedBlackBST<Key extends Comparable<Key>, Value> {
           h = rotateRight(h);
         }
       }
-
       if (key.compareTo(h.key) == 0 && h.right == null) {
         return null;
       }
-
       if (!isRed(h)) {
         if (!isRed(h.right)) {
           if (!isRed(h.right) && h.right != null && !isRed(h.right.left)) {
@@ -466,7 +462,6 @@ public class RedBlackBST<Key extends Comparable<Key>, Value> {
           }
         }
       }
-
       if (key.compareTo(h.key) == 0) {
         Node aux;
 
