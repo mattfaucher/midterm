@@ -22,6 +22,9 @@
 // Space complexity for all methods is O(N)
 // the size is dependent on the number of nodes
 
+
+// reference: https://github.com/reneargento/algorithms-sedgewick-wayne/blob/master/src/chapter1/section4/Exercise24_ThrowingEggs.java
+
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.NoSuchElementException;
@@ -108,11 +111,10 @@ public class RedBlackBST<Key extends Comparable<Key>, Value> {
           continue;
         }
       } else {
-        // Case when we have two children to compare
-        // compare left and right child to determine red / black
-        // this will determine traversal order, red means we go left when greater
-        // and right when less
-        // store the value that determines red or not (L > R -> RED)
+        // Case when we have two children to compare compare left and right
+        // child to determine red / black this will determine traversal order,
+        // red means we go left when greater and right when less store the
+        // value that determines red or not (L > R -> RED)
         if (parent.left != null && parent.right != null) {
           // If current parent node is black...
           // we traversal normally
@@ -152,8 +154,7 @@ public class RedBlackBST<Key extends Comparable<Key>, Value> {
 
   // number of node in subtree rooted at x; 0 if x is null
   private int size(Node x) {
-    if (x == null)
-      return 0;
+    if (x == null) return 0;
     return x.size;
   }
 
@@ -233,6 +234,7 @@ public class RedBlackBST<Key extends Comparable<Key>, Value> {
     if (key == null)
       throw new IllegalArgumentException("first argument to put() is null");
     if (val == null) {
+      // if we are passed a null value, delete the key
       delete(key);
       return;
     }
@@ -398,26 +400,97 @@ public class RedBlackBST<Key extends Comparable<Key>, Value> {
   // delete the key-value pair with the given key rooted at h
   private Node delete(Node h, Key key) {
     // assert get(h, key) != null;
+    if (h == null) return null;
+
     if (key.compareTo(h.key) < 0) {
-      if (!isRed(h.left) && !isRed(h.left.left))
-        h = moveRedLeft(h);
-      h.left = delete(h.left, key);
-    } else {
-      if (isRed(h.left))
-        h = rotateRight(h);
-      if (key.compareTo(h.key) == 0 && (h.right == null))
-        return null;
-      if (!isRed(h.right) && !isRed(h.right.left))
-        h = moveRedRight(h);
-      if (key.compareTo(h.key) == 0) {
-        Node x = min(h.right);
-        h.key = x.key;
-        h.val = x.val;
-        // h.val = get(h.right, min(h.right).key);
-        // h.key = min(h.right).key;
-        h.right = deleteMin(h.right);
-      } else
+      if (!isRed(h)) {
+        if (!isRed(h.left)) {
+          if (!isRed(h.left) && h.left != null && !isRed(h.left.left)) {
+            h = moveRedLeft(h);
+          }
+        } else {
+          if (!isRed(h.left) && h.left != null && !isRed(h.left.right)) {
+            h = moveRedLeft(h);
+          }
+        }
+      } else {
+        if (!isRed(h.right)) {
+          if (!isRed(h.right) && h.right != null && !isRed(h.right.left)) {
+            h = moveRedLeft(h);
+          }
+        } else {
+          if (!isRed(h.right) && h.right != null && !isRed(h.right.right)) {
+            h = moveRedLeft(h);
+          }
+        }
+      }
+
+      if (!isRed(h)) {
+        h.left = delete(h.left, key);
+      } else {
         h.right = delete(h.right, key);
+      }
+    } else {
+      if (!isRed(h)) {
+        if (isRed(h.left)) {
+          h = rotateRight(h);
+        }
+      } else {
+        if (isRed(h.right)) {
+          h = rotateRight(h);
+        }
+      }
+
+      if (key.compareTo(h.key) == 0 && h.right == null) {
+        return null;
+      }
+
+      if (!isRed(h)) {
+        if (!isRed(h.right)) {
+          if (!isRed(h.right) && h.right != null && !isRed(h.right.left)) {
+            h = moveRedRight(h);
+          }
+        } else {
+          if (!isRed(h.right) && h.right != null && !isRed(h.right.right)) {
+            h = moveRedRight(h);
+          }
+        }
+      } else {
+        if (!isRed(h.right)) {
+          if (!isRed(h.left) && h.left != null && !isRed(h.left.left)) {
+            h = moveRedRight(h);
+          }
+        } else {
+          if (!isRed(h.left) && h.left != null && !isRed(h.left.right)) {
+            h = moveRedRight(h);
+          }
+        }
+      }
+
+      if (key.compareTo(h.key) == 0) {
+        Node aux;
+
+        if (!isRed(h)) {
+          aux = min(h.right);
+        } else {
+          aux = min(h.left);
+        }
+
+        h.key = aux.key;
+        h.val = aux.val;
+
+        if (!isRed(h)) {
+          h.right = deleteMin(h.right);
+        } else {
+          h.left = deleteMin(h.left);
+        }
+      } else {
+        if (!isRed(h)) {
+          h.right = delete(h.right, key);
+        } else {
+          h.left = delete(h.left, key);
+        }
+      }
     }
     return balance(h);
   }
@@ -441,7 +514,18 @@ public class RedBlackBST<Key extends Comparable<Key>, Value> {
       // nothing to rotate
       if (h.left == null) return h;
     }
+    
+    // if h is a red node then we must flip its
+    // children before pointer rearrangement in
+    // order to avoid after affects of the pointer
+    // swapping
+    if (isRed(h)) flipChildren(h);
+    // if the node's right child is red, then we must flip
+    // its children because of the same reason above, this would
+    // also be two consecutive red nodes which we want to avoid
+    if (isRed(h.right)) flipChildren(h.right);
     // Pointer rearrangement same as original implementation
+    // x will become our new root
     Node x = h.right;
     h.right = x.left;
     x.left = h;
@@ -450,6 +534,7 @@ public class RedBlackBST<Key extends Comparable<Key>, Value> {
     // after rotating pointers, flip children of x to match h
     if (isRed(h)) flipChildren(x);
     // h.color = RED, synonymous
+    // if h is not red, make it red
     if (!isRed(h)) flipChildren(h);
     // Set x's size to previous root's size (h)
     x.size = h.size;
@@ -462,6 +547,17 @@ public class RedBlackBST<Key extends Comparable<Key>, Value> {
   private Node rotateRight(Node h) {
     // basic null check, return null
     if (h == null) return null;
+    // if the node is black, and it has no left child, then there's no work to be done
+    if (!isRed(h) && h.left == null) return h;
+    // if the node is red, and it has no right child, then there's no work to be done
+    if (isRed(h) && h.right == null) return h;
+    
+    // flip children if we have a red node to prevent after effects
+    // of rotating and pointer reassignment
+    if (isRed(h)) flipChildren(h);
+    // flip children if we have a red node to prevent after effects
+    // of rotating and pointer reassignment for left child too
+    if (isRed(h.left)) flipChildren(h.left);
     // Pointer reassignment for rotation
     Node x = h.left;
     h.left = x.right;
@@ -471,6 +567,8 @@ public class RedBlackBST<Key extends Comparable<Key>, Value> {
     if (!isRed(h)) flipChildren(h);
     // nodes without children are black
     // make the flipped root red and children black
+    // since the children will have no children of their own in
+    // this new orientation
     if (!isRed(x) && x.left != null && x.right != null) {
       flipChildren(x);
       flipChildren(x.left);
@@ -483,6 +581,7 @@ public class RedBlackBST<Key extends Comparable<Key>, Value> {
   }
 
   // flip the colors of a node and its two children
+  // invert root and it's children if they are opposites
   private void flipColors(Node h) {
     // null check on parameter
     if (h == null) return;
@@ -702,6 +801,8 @@ public class RedBlackBST<Key extends Comparable<Key>, Value> {
     if (hi == null)
       throw new IllegalArgumentException("second argument to keys() is null");
 
+    // Use a LinkedList to implement the Queue, since Java's Queue
+    // is an interface we can't create an instance of it
     Queue<Key> queue = new LinkedList<Key>();
     // if (isEmpty() || lo.compareTo(hi) > 0) return queue;
     keys(root, queue, lo, hi);
@@ -715,8 +816,8 @@ public class RedBlackBST<Key extends Comparable<Key>, Value> {
     // store the lo and hi comparisons to current key
     int cmplo = lo.compareTo(x.key);
     int cmphi = hi.compareTo(x.key);
-    // operations similar to Inorder traversal of Binary Tree
-    // if less, call left side
+    // operations similar to Inorder traversal of Binary Tree if less, call
+    // left side
     if (cmplo < 0) keys(x.left, queue, lo, hi);
     // add when they're the same comparison value
     if (cmplo <= 0 && cmphi >= 0) queue.add(x.key);
