@@ -1,32 +1,28 @@
-/*
-   Throwing eggs from a building. Suppose that you have an N-story building and
-   plenty of eggs. Suppose also that an egg is broken if it is thrown off floor F
-   or higher, and unhurt otherwise. First, devise a strategy to determine the
-   value of F such that the number of broken eggs is ~lg N when using ~lg N
-   throws, then find a way to reduce the cost to ~2lg F.
-*/
 /* 
- * This problem requires that we use binary search to find the first occurrence
- * of an egg breaking. However in order to optimize our solution to be ~2logF
- * we must use power's of 2 traversal of an array to find the first occurrence
- * of a breaking egg, then use binary search on the smaller space rather than
- * binary searching over the entire array of size N.
+  This problem requires that we use binary search to find the first occurrence
+  of an egg breaking. However in order to optimize our solution to be ~2logF we
+  must use power's of 2 traversal of an array to find the first occurrence of a
+  breaking egg, then use binary search on the smaller space rather than binary
+  searching over the entire array of size N.
  */
 /* ======= COMPLEXITIES ============ */
 // Time complexity of Binary search = O(log N)
 // Space complexity of Binary Search = N
 // Time complexity of findFloorLogF = O(~2 log F)
 // Space complexity of findFloorLogF = N
-
+/*
+   Throwing eggs from a building. Suppose that you have an N-story building and
+   plenty of eggs. Suppose also that an egg is broken if it is thrown off floor
+   F or higher, and unhurt otherwise. First, devise a strategy to determine the
+   value of F such that the number of broken eggs is ~lg N when using ~lg N
+     throws, then find a way to reduce the cost to ~2lg F.
+*/
 public class ThrowingEggs {
   /*
-   * Algorithm for solution is binary search
-   * for 2 lg F -> start at floor 1->2->4->8 etc
-   * until first egg breaks
-   * Once we find where first egg breaks use binary
-   * search in the smaller space (range < F)
+    Algorithm for solution is binary search for 2 lg F -> start at floor
+    1->2->4->8 etc until first egg breaks Once we find where first egg breaks
+    use binary search in the smaller space (range < F)
    */
-
   // Find the floor in Log time using Binary Search
   public int findFloorBinarySearchLogN(int[] floors) {
     // this uses regular binary search over the whole size of the floors
@@ -38,6 +34,7 @@ public class ThrowingEggs {
   }
   
   // Binary search implementation
+  // we just have to check for 1 or 0 at given index
   private int binarySearch(int[] arr, int l, int r) {
     // if left is still below right in array
     if (l <= r) {
@@ -77,9 +74,8 @@ public class ThrowingEggs {
     int prevPower = power2 / 2;
     // now power2 will be > floors.length, so we take the smaller of the two values
     int minLength = Math.min(power2, floors.length - 1);
-    
     // delegate work to binary search
-    return binarySearch(floors, prevPower, minLength);
+    return binarySearch(floors, prevPower + 1, minLength);
   }
   
   // method for running unit tests more easily than typing them out manually
@@ -116,12 +112,16 @@ public class ThrowingEggs {
 
     System.out.println("===========Test 5==========");
     int[] test5 = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-      0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,1,1,1,1,1};
+      0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1};
     eggs.unitTest(eggs, test5, 50);
 
     System.out.println("===========Test 6==========");
     int[] test6 = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
       0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
     eggs.unitTest(eggs, test6, -1);
+
+    System.out.println("===========Test 7==========");
+    int[] test7 = {0,0,0,0,0,0,0,0,1};
+    eggs.unitTest(eggs, test7, 8);
   }
 }
