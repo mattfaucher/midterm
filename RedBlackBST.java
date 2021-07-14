@@ -430,72 +430,75 @@ public class RedBlackBST<Key extends Comparable<Key>, Value> {
           if (!isRed(h.right.right)) h = moveRedLeft(h);
         }
       }
-      // base cases for deletion
-      // TODO
+      // if h is black, we call delete on the left side
+      if (!isRed(h)) h.left = delete(h.left, key);
+      // if h is red, we call delete on right side (inverted)
+      else h.right = delete(h.right, key);
+    } 
+    // if key is greater than h's key
+    if (key.compareTo(h.key) > 0) {
+      // if h is a black node
       if (!isRed(h)) {
-        h.left = delete(h.left, key);
+        // we check if the left is red
+        // if the left child is red we must
+        // rotate h right to rebalance
+        if (isRed(h.left)) h = rotateRight(h);
       } else {
-        h.right = delete(h.right, key);
+        // if h's right child is red we need to rotate h right
+        // this will rebalance the rbt
+        if (isRed(h.right)) h = rotateRight(h);
       }
-    } else {
+      // if the keys are equal and h has no right child
+      // we return null because there's no work to be done
+      // since h has been updated, we check for equality then return null
+      if (key.compareTo(h.key) == 0 && h.right == null) return null;
+      // if h is black
       if (!isRed(h)) {
-        if (isRed(h.left)) {
-          h = rotateRight(h);
-        }
-      } else {
-        if (isRed(h.right)) {
-          h = rotateRight(h);
-        }
-      }
-      if (key.compareTo(h.key) == 0 && h.right == null) {
-        return null;
-      }
-      if (!isRed(h)) {
+        // we check the right child for black as well
         if (!isRed(h.right)) {
-          if (!isRed(h.right) && h.right != null && !isRed(h.right.left)) {
-            h = moveRedRight(h);
-          }
-        } else {
-          if (!isRed(h.right) && h.right != null && !isRed(h.right.right)) {
-            h = moveRedRight(h);
-          }
+          // if h's right child's left child is black, we need to move red right
+          // in order to balance the tree
+          if (!isRed(h.right.left)) h = moveRedRight(h);
         }
       } else {
+        // For h when h is RED
+        // if right child of h is black
         if (!isRed(h.right)) {
-          if (!isRed(h.left) && h.left != null && !isRed(h.left.left)) {
-            h = moveRedRight(h);
-          }
+          // if h's left child is black, and the left's left is black as well
+          // move the red h to the right
+          if (!isRed(h.left) && !isRed(h.left.left)) h = moveRedRight(h);
         } else {
-          if (!isRed(h.left) && h.left != null && !isRed(h.left.right)) {
-            h = moveRedRight(h);
-          }
-        }
-      }
-      if (key.compareTo(h.key) == 0) {
-        Node aux;
-
-        if (!isRed(h)) {
-          aux = min(h.right);
-        } else {
-          aux = min(h.left);
-        }
-
-        h.key = aux.key;
-        h.val = aux.val;
-
-        if (!isRed(h)) {
-          h.right = deleteMin(h.right);
-        } else {
-          h.left = deleteMin(h.left);
-        }
-      } else {
-        if (!isRed(h)) {
-          h.right = delete(h.right, key);
-        } else {
-          h.left = delete(h.left, key);
+          // When h's right is RED
+          // check if h left is black and h's left's right is also black
+          if (!isRed(h.left) && !isRed(h.left.right)) h = moveRedRight(h);
         }
       }
     }
+    // Case when we have equal keys (h and key)
+    if (key.compareTo(h.key) == 0) {
+      // store an additional Node
+      Node x;
+      // if h is black, set x to be the min of the right subtree
+      // for deletion
+      if (!isRed(h)) x = min(h.right);
+      // if h is red then we get min from left subtree to delete
+      else x = min(h.left);
+      // update h's key, val to take the deleted node's
+      h.key = x.key;
+      h.val = x.val;
+      // if h is black deleteMin on right subtree
+      // similar to hibbard deletion
+      if (!isRed(h)) h.right = deleteMin(h.right);
+      // if h is red then we do the opposite
+      else h.left = deleteMin(h.left);
+    }
+    // default case to continue the recursion
+    // Case when they key's aren't equal
+    // call delete on h.right for black root
+    if (!isRed(h)) h.right = delete(h.right, key);
+    // call delete on h.left for red root
+    else h.left = delete(h.left, key);
+    // call balance on h
     return balance(h);
   }
 
@@ -555,7 +558,6 @@ public class RedBlackBST<Key extends Comparable<Key>, Value> {
     if (!isRed(h) && h.left == null) return h;
     // if the node is red, and it has no right child, then there's no work to be done
     if (isRed(h) && h.right == null) return h;
-    
     // flip children if we have a red node to prevent after effects
     // of rotating and pointer reassignment
     if (isRed(h)) flipChildren(h);
