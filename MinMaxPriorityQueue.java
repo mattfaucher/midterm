@@ -18,6 +18,7 @@
 // Space Complexity of all operations = O(N) 
 // Since we are using arrays our space grows with the size of our arrays
 
+import java.lang.reflect.Array;
 import java.util.HashSet;
 
 /* Min/max priority queue. Design a data type that supports the following
@@ -26,16 +27,16 @@ import java.util.HashSet;
  * and find the maximum and find the minimum (both in constant time).
  * Hint: Use two heaps.
  */
-public class MinMaxPriorityQueue {
+public class MinMaxPriorityQueue<Key extends Comparable<Key>> {
   // Use array as underlying implementation
   // two arrays to represent 2 heaps
   // resizing array when capcacity is surpassed
   // use HashSet to handle the collision of deleting from both heaps
   // can't have duplicate values inside of our Set so it allows us to
   // compare against when we need to delete a value from the opposing heap
-  Comparable[] minPQ;
-  Comparable[] maxPQ;
-  HashSet<Comparable> deleted;
+  Key[] minPQ;
+  Key[] maxPQ;
+  HashSet<Key> deleted;
   int Nmin;
   int Nmax;
   final boolean MAX = false;
@@ -43,9 +44,13 @@ public class MinMaxPriorityQueue {
 
   // Constructs a new MinMaxPriorityQueue
   public MinMaxPriorityQueue(int initCapacity) {
-    this.minPQ = new Comparable[initCapacity + 1];
-    this.maxPQ = new Comparable[initCapacity + 1];
-    this.deleted = new HashSet<Comparable>();
+    // Not needed but good practice for generic checking
+    //@SuppressWarnings("unchecked")
+    final Key[] minPQ = (Key[]) Array.newInstance(Comparable.class, initCapacity + 1);
+    this.minPQ = minPQ;
+    final Key[] maxPQ = (Key[]) Array.newInstance(Comparable.class, initCapacity + 1);
+    this.maxPQ = maxPQ;
+    this.deleted = new HashSet<Key>();
     this.Nmin = 0;
     this.Nmax = 0;
   }
@@ -57,19 +62,19 @@ public class MinMaxPriorityQueue {
   }
 
   // Return the max in the heap
-  public Comparable max() {
+  public Key max() {
     if (isEmpty(MAX)) return null;
     return maxPQ[1];
   }
 
   // Return the min in the heap
-  public Comparable min() {
+  public Key min() {
     if (isEmpty(MIN)) return null;
     return minPQ[1];
   }
 
   // Inserts a key into the PriorityQueue
-  public void insert(Comparable key) {
+  public void insert(Key key) {
     if (Nmin >= minPQ.length - 1 && Nmax > maxPQ.length - 1) return;
     // insert into minPQ
     minPQ[++Nmin] = key;
@@ -85,7 +90,7 @@ public class MinMaxPriorityQueue {
   public void deleteMax() {
     if (isEmpty(MAX)) return;
     // Get value at index 1, Max always at index 1
-    Comparable max = maxPQ[1];
+    Key max = maxPQ[1];
     // add the deleted max to the HashSet
     deleted.add(max);
     // swap
@@ -111,7 +116,7 @@ public class MinMaxPriorityQueue {
   // Delete min from minPQ and return value
   public void deleteMin() {
     if (isEmpty(MIN)) return; // Get value at index 1, min always at index 1
-    Comparable min = minPQ[1];
+    Key min = minPQ[1];
     // Add the min to the deleted HashSet
     deleted.add(min);
     // swap
@@ -181,14 +186,14 @@ public class MinMaxPriorityQueue {
   }
 
   // Swap method to work for both min and max heaps
-  private void swap(Comparable[] arr, int min, int index) {
-    Comparable tmp = arr[index];
+  private void swap(Key[] arr, int min, int index) {
+    Key tmp = arr[index];
     arr[index] = arr[min];
     arr[min] = tmp;
   }
 
   // Method to compare two objects
-  private boolean less(Comparable a, Comparable b) {
+  private boolean less(Key a, Key b) {
     return a.compareTo(b) < 0;
   }
 
@@ -222,7 +227,7 @@ public class MinMaxPriorityQueue {
   public static void main(String[] args) {
     /* TESTING WITH INT */
     System.out.println("=======INT TEST=========");
-    MinMaxPriorityQueue test = new MinMaxPriorityQueue(10);
+    MinMaxPriorityQueue<Integer> test = new MinMaxPriorityQueue<Integer>(10);
     test.insert(20);
     test.insert(5);
     test.insert(10);
@@ -260,7 +265,7 @@ public class MinMaxPriorityQueue {
 
     // ======= TEST 2 ========
     System.out.println("=======STRING TEST=========");
-    MinMaxPriorityQueue other = new MinMaxPriorityQueue(10);
+    MinMaxPriorityQueue<String> other = new MinMaxPriorityQueue<String>(10);
     other.insert("S");
     other.insert("E");
     other.insert("A");
